@@ -1,5 +1,7 @@
 package com.s63d.simulator
 
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.result.Result
 import com.s63d.domain.database.RoutesItem
 import com.s63d.simulator.repositories.RouteRepository
 import com.s63d.simulator.utils.*
@@ -8,6 +10,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import kotlinx.coroutines.experimental.*
 import org.springframework.data.geo.Point
+import java.util.*
 import kotlin.math.roundToInt
 
 @Component
@@ -15,10 +18,10 @@ class SimulatorComponent(private val routeRepository: RouteRepository) : Command
     companion object {
         //Config
         const val DESTINATION_URL = "http://localhost:8080/api/location"
-        const val SLEEP_TIME: Long = 1_000
+        const val SLEEP_TIME: Long = 5_000
         const val REAL_LIFE_TIME = 30
 
-        const val SIMULATIONS = 1
+        const val SIMULATIONS = 10000
     }
 
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -28,7 +31,11 @@ class SimulatorComponent(private val routeRepository: RouteRepository) : Command
         val routes = routeRepository.findAll()
 
         launch {
-            SimulatorTask(routes[0]).run()
+            (0..SIMULATIONS).forEach {
+                async {
+                    SimulatorTask(routes.random(), it).run() }
+                }
+            delay(Random().nextInt(SLEEP_TIME.toInt()))
         }
 
         logger.info("Finished loading ${routes.size} routes")
@@ -36,7 +43,7 @@ class SimulatorComponent(private val routeRepository: RouteRepository) : Command
     }
 
 
-    inner class SimulatorTask(private val route: RoutesItem) {
+    inner class SimulatorTask(private val route: RoutesItem, private val id:Int = 1) {
         private val logger = LoggerFactory.getLogger(this::class.java)
         private var durationleft = REAL_LIFE_TIME
         lateinit var currentLocation: Point
@@ -87,9 +94,15 @@ class SimulatorComponent(private val routeRepository: RouteRepository) : Command
         }
 
         private fun postLocation() {
-            logger.info("Posting location!")
-            logger.info(currentLocation.toString())
-            logger.info("")
+            val req = Fuel.post(DESTINATION_URL, listOf("x" to currentLocation.x, "y" to currentLocation.y, "id" to id))
+            req.response { request, response, result ->
+                if (result is Result.Failure) {
+                    println(result.error)
+                }
+            }
         }
     }
+
+    private fun <E> List<E>.random(): E = if (size == 0) throw UnsupportedOperationException() else get(Random().nextInt(size))
+
 }
