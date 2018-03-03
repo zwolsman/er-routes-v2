@@ -43,8 +43,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.s63d</groupId>
+            <artifactId>domain</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
