@@ -24,7 +24,7 @@ class ScraperComponent (val routeRepository: RouteRepository) {
         }
     }
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
+    private val logger = LoggerFactory.getLogger(ScraperComponent::class.java)
 
     @Scheduled(fixedRate = 5000)
     fun scrapeRoute() {
@@ -32,9 +32,7 @@ class ScraperComponent (val routeRepository: RouteRepository) {
         val to = cities.random()
 
         logger.info("Calculating trip from $from to $to")
-        Fuel.get(URL, listOf("origin" to from, "destination" to to)).responseObject(jacksonDeserializerOf<MapsResponse>()) { _, response, result ->
-
-
+        Fuel.Companion.get(URL, listOf("origin" to from, "destination" to to)).responseObject(jacksonDeserializerOf<MapsResponse>()) { _, response, result ->
             if (result is Result.Failure) {
                 logger.error("Response: ${response.responseMessage} (${response.statusCode})", result.error)
                 return@responseObject
