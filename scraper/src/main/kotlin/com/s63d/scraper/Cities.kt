@@ -1,4 +1,6 @@
-package com.s63d.domain.scraper
+package com.s63d.scraper
+
+import java.util.*
 
 val cities = listOf("Vienna",
         "Graz",
@@ -77,3 +79,4 @@ val cities = listOf("Vienna",
         "Groß-Enzersdorf",
         "Seekirchen am Wallersee",
         "Sankt Andrä")
+fun <E> List<E>.random(): E = if (size == 0) throw UnsupportedOperationException() else get(Random().nextInt(size))

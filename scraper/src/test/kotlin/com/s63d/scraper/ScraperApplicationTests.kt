@@ -1,4 +1,4 @@
-package com.s63d.domain.scraper
+package com.s63d.scraper
 
 import org.junit.Test
 import org.junit.runner.RunWith

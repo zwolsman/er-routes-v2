@@ -1,4 +1,4 @@
-package com.s63d.domain.scraper.repositories
+package com.s63d.scraper.repositories
 
 import com.s63d.domain.database.RoutesItem
 import org.bson.types.ObjectId
